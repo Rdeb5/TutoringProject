@@ -1,56 +1,72 @@
-import logo from './logo.svg';
+//import logo from './logo.svg';
+//4zjTBnB4G5BYYNW3
+//import axios from "axios";
 import './App.css';
 import { useState } from "react";
+import timeSlotsData from './timeSlots.json'; // Import the JSON data
+
+
+// const { MongoClient, ServerApiVersion } = require('mongodb');
+// const pass = encodeURIComponent("4zjTBnB4G5BYYNW3");
+// const uri = `mongodb+srv://gkommi:${pass}@cluster0.wln3fvb.mongodb.net/?retryWrites=true&w=majority`;
+// // Create a MongoClient with a MongoClientOptions object to set the Stable API version
+// const client = new MongoClient(uri, {
+//   serverApi: {
+//     version: ServerApiVersion.v1,
+//     strict: true,
+//     deprecationErrors: true,
+//   }
+// });
+// async function run() {
+//   try {
+//     // Connect the client to the server	(optional starting in v4.7)
+//     await client.connect();
+//     // Send a ping to confirm a successful connection
+//     await client.db("admin").command({ ping: 1 });
+//     console.log("Pinged your deployment. You successfully connected to MongoDB!");
+//   } finally {
+//     // Ensures that the client will close when you finish/error
+//     await client.close();
+//   }
+// }
+// run().catch(console.dir);
+
+
 
 function App() {
-  
-  const [booking, setBooking] = useState("Adyant");
-  const [selected, setSelected] = useState('');
+  // State variable to store the selected day
   const [selectedDay, setSelectedDay] = useState('Monday');
 
-  function generateTimeSlots(selectedDate) {
-    const dateObj = new Date(selectedDate);
-    const selectedHour = dateObj.getHours();
-    const selectedMinute = dateObj.getMinutes();
-
-    const startTime = 8;
-    const endTime = 17; // 5:00 p.m.
-    const timeSlots = [];
-
-    for (let hour = startTime; hour <= endTime; hour++) {
-      let startMinute = hour === selectedHour ? (selectedMinute === 0 ? 30 : 0) : 0;
-
-      for (let minute = startMinute; minute < 60; minute += 30) {
-        // Format time slots in AM/PM format
-        const period = hour >= 12 ? 'PM' : 'AM';
-        const displayHour = hour % 12 === 0 ? 12 : hour % 12;
-        timeSlots.push(`${displayHour}:${minute.toString().padStart(2, '0')} ${period}`);
-      }
-    }
-
-    return timeSlots;
-  }
-
-  function handleSubmit() {
-    console.log(selected, booking);
-  }
-
+  // Function to handle day selection change
   function handleDayChange(event) {
     setSelectedDay(event.target.value);
-    setSelected('');
   }
 
+  // Get the time slots for the selected day from the JSON data
+  const selectedDayTimeSlots = timeSlotsData[selectedDay];
+
+  // State variable to store the booking name
+  const [booking, setBooking] = useState("Adyant");
+
+  // State variable to store the selected time slot
+  const [selected, setSelected] = useState('');
+
+  // Function to handle time slot selection
+  function handleTimeSlotClick(timeSlot) {
+    // If the time slot is not already selected (state === 0)
+    if (timeSlot.state === 0) {
+      setSelected(timeSlot.id);
+      // Here, you can update the JSON data to mark the time slot as selected by setting state to 1
+      // For example: timeSlot.state = 1;
+      // Make sure to avoid directly modifying the imported JSON data; use a copy or clone instead
+    }
+  }
+
+  // JSX for rendering the component
   return (
     <div className="flex flex-col items-center justify-center min-h-screen">
-      <div>
-        <h1 className="text-10x1 font-bold">
-          Brain Boost
-        </h1>
-      </div>
-      <div className="border border-slate-900 p-4 rounded-md text-center">
-        <label className="text-left px-2">
-        Enter your name: 
-        </label>
+      <div className="border border-gray-300 p-4 rounded-md text-center">
+        <label className="text-left px-2">Enter your name:</label>
         <input
           type="text"
           value={booking}
@@ -58,6 +74,7 @@ function App() {
           placeholder="Enter your name"
           className="border border-2 px-2 py-1 mb-4 w-50"
         />
+        {/* Select input for day selection */}
         <div className="flex items-center mb-4">
           <div className="flex items-center space-x-2">
             <label htmlFor="day-select">Select a day:</label>
@@ -67,21 +84,21 @@ function App() {
               onChange={handleDayChange}
               className="border border-2 px-2 py-1"
             >
-              <option value="Monday">Monday </option>
-              <option value="Tuesday">Tuesday</option>
-              <option value="Wednesday">Wednesday</option>
-              <option value="Thursday">Thursday</option>
-              <option value="Friday">Friday</option>
+              {/* Options for different days */}
+              {Object.keys(timeSlotsData).map((day) => (
+                <option key={day} value={day}>
+                  {day}
+                </option>
+              ))}
             </select>
-        </div>
+          </div>
           <div className="flex items-center space-x-2">
-             <label htmlFor="week-select" className="ml-3">Select a week:</label>
+            <label htmlFor="week-select" className="ml-3">Select a week:</label>
             <select
               id="week-select"
-              // value={selectedDay}
-              // onChange={handleDayChange}
               className="border border-2 px-1 py-1"
             >
+              {/* Options for different weeks */}
               <option value="Week1">7/31/23 - 8/4/23</option>
               <option value="Week2">8/7/23 - 8/11/23</option>
               <option value="Week3">8/14/23 - 8/18/23</option>
@@ -90,18 +107,20 @@ function App() {
             </select>
           </div>
         </div>
+        {/* Time slot buttons */}
         <div className="flex flex-col space-y-2">
-          {generateTimeSlots(selected).map((timeSlot, index) => (
+          {selectedDayTimeSlots.map((timeSlot) => (
             <button
-              key={index}
-              className={selected === timeSlot ? 'bg-red-500 border border-2 w-24' : 'border border-2 hover:bg-green-500 bg-gray-500 w-24'}
-              onClick={() => setSelected(timeSlot)}
+              key={timeSlot.id}
+              className={timeSlot.state === 1 ? 'bg-red-500 border border-2 w-24' : 'border border-2 hover:bg-green-500 bg-gray-500 w-24'}
+              disabled={timeSlot.state === 1} // Disable the button if the state is 1 (already selected)
+              onClick={() => handleTimeSlotClick(timeSlot)}
             >
-              {timeSlot}
+              {timeSlot.id}
             </button>
           ))}
         </div>
-        <button className="border border-2 mt-4" onClick={handleSubmit}>
+        <button className="border border-2 mt-4" onClick={() => console.log(selected, booking)}>
           Submit
         </button>
       </div>
@@ -110,6 +129,7 @@ function App() {
 }
 
 export default App;
+
 
 // function App() {
 
