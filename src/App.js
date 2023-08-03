@@ -3,6 +3,7 @@ import './App.css';
 import { useState } from "react";
 
 function App() {
+  
   const [booking, setBooking] = useState("Adyant");
   const [selected, setSelected] = useState('');
   const [selectedDay, setSelectedDay] = useState('Monday');
@@ -41,7 +42,12 @@ function App() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen">
-      <div className="border border-gray-300 p-4 rounded-md text-center">
+      <div>
+        <h1 className="text-10x1 font-bold">
+          Brain Boost
+        </h1>
+      </div>
+      <div className="border border-slate-900 p-4 rounded-md text-center">
         <label className="text-left px-2">
         Enter your name: 
         </label>
