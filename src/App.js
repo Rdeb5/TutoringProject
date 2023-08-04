@@ -1,6 +1,6 @@
 //import logo from './logo.svg';
 //4zjTBnB4G5BYYNW3
-//import axios from "axios";
+
 import './App.css';
 import { useState } from "react";
 import timeSlotsData from './timeSlots.json'; // Import the JSON data
@@ -35,7 +35,7 @@ import timeSlotsData from './timeSlots.json'; // Import the JSON data
 
 function App() {
   // State variable to store the selected day
-  const [selectedDay, setSelectedDay] = useState('Monday');
+  const [selectedDay, setSelectedDay] = useState('0');
 
   // Function to handle day selection change
   function handleDayChange(event) {
@@ -51,6 +51,18 @@ function App() {
   // State variable to store the selected time slot
   const [selected, setSelected] = useState('');
 
+  //one time slot: [state,name]
+  const getTimeSlots = 
+      [["Monday",[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""]],
+      ["Tuesday",[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""]],
+      ["Wednesday",[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""]]]
+  
+  
+  const[data,setData]=useState(getTimeSlots);
+
+
+
+
   // Function to handle time slot selection
   function handleTimeSlotClick(timeSlot) {
     // If the time slot is not already selected (state === 0)
@@ -61,6 +73,16 @@ function App() {
       // Make sure to avoid directly modifying the imported JSON data; use a copy or clone instead
     }
   }
+
+  // let startTime = new Date();
+  // startTime.setHours(7, 30, 0, 0); // Set the start time to 8:00 AM
+
+  // function generateTimeSlots(){
+  //   startTime.setMinutes(startTime.getMinutes() + 30);
+  //   return startTime.toString();
+
+  // }
+ 
 
   // JSX for rendering the component
   return (
@@ -85,9 +107,9 @@ function App() {
               className="border border-2 px-2 py-1"
             >
               {/* Options for different days */}
-              {Object.keys(timeSlotsData).map((day) => (
-                <option key={day} value={day}>
-                  {day}
+              {data.map((day,index) => (
+                <option key={index} value={index}>
+                  {day[0] }
                 </option>
               ))}
             </select>
@@ -109,18 +131,18 @@ function App() {
         </div>
         {/* Time slot buttons */}
         <div className="flex flex-col space-y-2">
-          {selectedDayTimeSlots.map((timeSlot) => (
+          {data[selectedDay].map((timeSlot,index) => (
             <button
               key={timeSlot.id}
               className={timeSlot.state === 1 ? 'bg-red-500 border border-2 w-24' : 'border border-2 hover:bg-green-500 bg-gray-500 w-24'}
               disabled={timeSlot.state === 1} // Disable the button if the state is 1 (already selected)
               onClick={() => handleTimeSlotClick(timeSlot)}
             >
-              {timeSlot.id}
+              {index}
             </button>
           ))}
         </div>
-        <button className="border border-2 mt-4" onClick={() => console.log(selected, booking)}>
+        <button className="border border-2 mt-4" >
           Submit
         </button>
       </div>
