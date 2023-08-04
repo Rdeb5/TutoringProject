@@ -49,9 +49,13 @@ function App() {
   const [booking, setBooking] = useState("");
 
   // State variable to store the selected time slot
-  const [selected, setSelected] = useState('');
+  const [selected, setSelected] = useState(0);
+
+  //const [, forceUpdate] = useReducer(x => x + 1, 0);
+
 
   //one time slot: [state,name]
+  
   const getTimeSlots = 
   [
     ["Monday",[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""]],
@@ -60,7 +64,6 @@ function App() {
   ];
   
   const[data,setData]=useState(getTimeSlots);
-
 
 
 
@@ -77,7 +80,45 @@ function App() {
       setData(newData);
       // Set the selected time slot index
       setSelected(index);
+      console.log(selected);
+      console.log(data[selectedDay][selected]);
   }
+
+  function handleSubmit() {
+    console.log(selected);
+  
+    // Update the name in the selected time slot based on the input value
+    const newName = document.getElementById("Name").value;
+    const newData = [...data];
+    newData[selectedDay][selected][1] = newName;
+    newData[selectedDay][selected][0] = 2;
+  
+    // Update the state with the new data array
+    setData(newData, () => {
+      // This callback will be executed after the state is updated and the component is re-rendered.
+      console.log(data[selectedDay][selected]); // Log the updated state
+    });
+  }
+  
+
+
+  function renderIcon(){
+    console.log("came here")
+    return(
+      <div>Function called</div>
+    )
+  
+  // render();
+
+  //  return (
+  //      <div className="patient-container">
+
+  //      {this.renderIcon}      
+
+  //     </div>
+  //  );
+ }
+  
 
   
 
@@ -85,25 +126,29 @@ function App() {
 
   // JSX for rendering the component
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen">
-      <div className="border border-gray-300 p-4 rounded-md text-center">
+    <div className="flex flex-col items-center justify-center min-h-screen px-4">
+     <h1 className="text-6xl font-bold text-center text-blue-700 mt-8 mb-4">
+  Brain<span className="text-pink-500">Boost</span>
+</h1>
+      <div className="border border-gray-300 p-4 rounded-md text-center mt-3 w-30">
         <label className="text-left px-2">Enter your name:</label>
         <input
+          id='Name'
           type="text"
           value={booking}
           onChange={(e) => setBooking(e.target.value)}
           placeholder="Enter your name"
-          className="border border-2 px-2 py-1 mb-4 w-50"
+          className="border border-2 border-gray-300 shadow-md px-2 py-1 mb-4 w-full rounded-md focus:outline-none focus:ring-2 focus:ring-blue"
         />
         {/* Select input for day selection */}
-        <div className="flex items-center mb-4">
+        <div className="flex items-center mb-4 space-x-4">
           <div className="flex items-center space-x-2">
             <label htmlFor="day-select">Select a day:</label>
             <select
               id="day-select"
               value={selectedDay}
               onChange={handleDayChange}
-              className="border border-2 px-2 py-1"
+              className="border border-2 border-gray-300 px-2 py-1 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               {/* Options for different days */}
               {data.map((day,index) => (
@@ -117,7 +162,7 @@ function App() {
             <label htmlFor="week-select" className="ml-3">Select a week:</label>
             <select
               id="week-select"
-              className="border border-2 px-1 py-1"
+              className="border border-2 px-1 py-1 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               {/* Options for different weeks */}
               <option value="Week1">7/31/23 - 8/4/23</option>
@@ -130,7 +175,7 @@ function App() {
         </div>
         {/* Time slot buttons */}
 
-<div className="flex flex-col space-y-2">
+<div className="flex flex-col space-y-2 rounded-md">
   {data[selectedDay].map((timeSlot, index) => {
     // Calculate time based on the index (30 minutes interval)
     const startTime = new Date(0);
@@ -147,21 +192,26 @@ function App() {
       minute: 'numeric',
       hour12: true,
     });
+    
+    const displayIndex = index + 1;
 
-    return (
+     return (
       <button
         key={timeSlot.id}
-        className={timeSlot[0] === 1 ? 'bg-red-500 border border-2 w-24' : 'border border-2 hover:bg-green-500 bg-gray-500 w-24'}
-        onClick={() => handleTimeSlotClick(timeSlot)}
+        className={timeSlot[0] === 1 ? 'bg-green-500 border border-2 w-24' :
+        timeSlot[0] === 0 ? 'border border-2 hover:bg-green-500 bg-gray-500 w-24':
+        timeSlot[0] === 2 
+        ? 'pointer-events-none disabled cursor-not-allowed bg-red-500 border border-2 w-24 text-white' // Red background with white text and disabled state
+        : "text-white" // Default white text color}
+       }  onClick={() => handleTimeSlotClick(timeSlot)}
       >
-        {formattedStartTime}
+        {formattedStartTime} {timeSlot[1]}
       </button>
     );
   })}
 </div>
-
-
-        <button className="border border-2 mt-4" >
+        <button 
+         className="border border-2 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 mt-4 rounded-md" onClick = {() => { handleSubmit();} } >
           Submit
         </button>
       </div>
