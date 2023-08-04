@@ -35,28 +35,29 @@ import timeSlotsData from './timeSlots.json'; // Import the JSON data
 
 function App() {
   // State variable to store the selected day
-  const [selectedDay, setSelectedDay] = useState('0');
+  const [selectedDay, setSelectedDay] = useState(0);
 
   // Function to handle day selection change
   function handleDayChange(event) {
-    setSelectedDay(event.target.value);
+    setSelectedDay(parseInt(event.target.value));
   }
 
   // Get the time slots for the selected day from the JSON data
   const selectedDayTimeSlots = timeSlotsData[selectedDay];
 
   // State variable to store the booking name
-  const [booking, setBooking] = useState("Adyant");
+  const [booking, setBooking] = useState("");
 
   // State variable to store the selected time slot
   const [selected, setSelected] = useState('');
 
   //one time slot: [state,name]
   const getTimeSlots = 
-      [["Monday",[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""]],
-      ["Tuesday",[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""]],
-      ["Wednesday",[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""]]]
-  
+  [
+    ["Monday",[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""]],
+    ["Tuesday",[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""]],
+    ["Wednesday",[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""],[0,""]]
+  ];
   
   const[data,setData]=useState(getTimeSlots);
 
@@ -65,24 +66,22 @@ function App() {
 
   // Function to handle time slot selection
   function handleTimeSlotClick(timeSlot) {
-    // If the time slot is not already selected (state === 0)
-    if (timeSlot.state === 0) {
-      setSelected(timeSlot.id);
-      // Here, you can update the JSON data to mark the time slot as selected by setting state to 1
-      // For example: timeSlot.state = 1;
-      // Make sure to avoid directly modifying the imported JSON data; use a copy or clone instead
-    }
+     // Toggle the state of the selected time slot (0 to 1, or 1 to 0)
+     const newSelectedState = timeSlot[0] === 0 ? 1 : 0;
+      // Clone the data array to avoid directly modifying the original JSON data
+      const newData = [...data];
+      // Set the state of the selected time slot to 1 (selected)
+      const index = newData[selectedDay].indexOf(timeSlot);
+      newData[selectedDay][index][0] = newSelectedState;
+      // Update the data state with the new data array
+      setData(newData);
+      // Set the selected time slot index
+      setSelected(index);
   }
 
-  // let startTime = new Date();
-  // startTime.setHours(7, 30, 0, 0); // Set the start time to 8:00 AM
+  
 
-  // function generateTimeSlots(){
-  //   startTime.setMinutes(startTime.getMinutes() + 30);
-  //   return startTime.toString();
 
-  // }
- 
 
   // JSX for rendering the component
   return (
@@ -130,18 +129,38 @@ function App() {
           </div>
         </div>
         {/* Time slot buttons */}
-        <div className="flex flex-col space-y-2">
-          {data[selectedDay].map((timeSlot,index) => (
-            <button
-              key={timeSlot.id}
-              className={timeSlot.state === 1 ? 'bg-red-500 border border-2 w-24' : 'border border-2 hover:bg-green-500 bg-gray-500 w-24'}
-              disabled={timeSlot.state === 1} // Disable the button if the state is 1 (already selected)
-              onClick={() => handleTimeSlotClick(timeSlot)}
-            >
-              {index}
-            </button>
-          ))}
-        </div>
+
+<div className="flex flex-col space-y-2">
+  {data[selectedDay].map((timeSlot, index) => {
+    // Calculate time based on the index (30 minutes interval)
+    const startTime = new Date(0);
+    startTime.setHours(8 + Math.floor(index / 2), (index % 2) * 30, 0);
+
+    // Check if the time is past 5:30 pm (17:30), and if so, stop rendering
+    if (startTime.getHours() >= 18 && startTime.getMinutes() >= 0) {
+      return null;
+    }
+
+    // Format the time to display in 12-hour clock format
+    const formattedStartTime = startTime.toLocaleString('en-US', {
+      hour: 'numeric',
+      minute: 'numeric',
+      hour12: true,
+    });
+
+    return (
+      <button
+        key={timeSlot.id}
+        className={timeSlot[0] === 1 ? 'bg-red-500 border border-2 w-24' : 'border border-2 hover:bg-green-500 bg-gray-500 w-24'}
+        onClick={() => handleTimeSlotClick(timeSlot)}
+      >
+        {formattedStartTime}
+      </button>
+    );
+  })}
+</div>
+
+
         <button className="border border-2 mt-4" >
           Submit
         </button>
@@ -149,48 +168,4 @@ function App() {
     </div>
   );
 }
-
 export default App;
-
-
-// function App() {
-
-//   const [booking,setBooking]=useState(0);
-//   const [selected,setSelected] = useState(0);
-//   //const [state,setState]=useState(data);
-  
-
-//   function handleClick(){
-    
-//     return([selected, document.getElementById("name").value])
-//   }
-
-
-
-
-//   return (
-//     <div className="App">
-//       <div className="">
-//         <input type="text" id = "name" >
-
-//         </input>
-//         <button className = {booking===0?"border border-2 hover:bg-green-500 bg-gray-500":"bg-red-500 border border-2"} id="8am" onClick = {() => setSelected(1)}>
-//           8:00 a.m.
-//         </button>
-//         <button className = {booking===0?"border border-2 hover:bg-green-500 bg-gray-500":"bg-red-500 border border-2"} id="830am" onClick = {() => setSelected(2)}>
-//           8:30 a.m.
-//         </button>
-//         <button className = {booking===0?"border border-2 hover:bg-green-500 bg-gray-500":"bg-red-500 border border-2"} id="9am" onClick = {() => setSelected(3)}>
-//           9:00 a.m.
-//         </button>
-
-//         <div>
-          
-//         </div>
-//         <button className = "border border-2" onClick = {handleClick}>Submit</button>
-//       </div>
-//     </div>
-//   );
-// }
-
-// export default App;
